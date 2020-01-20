@@ -3,22 +3,25 @@ const db = require("../data/db-config")
 
 module.exports = {
     add,
-    findById
+    findById,
+    findBy
 }
 function findById(id){
-    return db("user")
-    .select('id','username')
+   return db("user")
     .where({id})
-    .first()
+    .first("id","username")
 }
 async function add(user){
     user.password = await bcrypt.hash(user.password,10)
-    console.log(user)
-    db('user').insert(user)
-    .then(ids => {
-        const [id] = ids
-        return findById(id)
-    })
-   
+
+     const [id] = await db("user")
+    .insert(user)
+ 
+  return findById(id)
     
 }
+function findBy(filter) {
+    return db("user")
+      .where(filter)
+      .select("id", "username", "password")
+  }
